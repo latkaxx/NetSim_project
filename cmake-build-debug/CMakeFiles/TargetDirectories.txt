@@ -1,3 +1,0 @@
-D:/.studia/sem3/Zaawansowane programowanie/NetSim_project/cmake-build-debug/CMakeFiles/NetSim_project.dir
-D:/.studia/sem3/Zaawansowane programowanie/NetSim_project/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/.studia/sem3/Zaawansowane programowanie/NetSim_project/cmake-build-debug/CMakeFiles/rebuild_cache.dir
