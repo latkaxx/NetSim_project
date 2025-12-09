@@ -39,3 +39,18 @@
 
 # debug information files
 *.dwo
+
+.idea/
+
+# foldery generowane przez CMake
+cmake-build-debug/
+cmake-build-release/
+cmake-build-*/
+out/
+build/
+
+# pliki CMake
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
