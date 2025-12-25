@@ -1,23 +1,27 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.16)
 project(NetSim_project)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include(FetchContent)
-FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/refs/heads/main.zip
-)
-FetchContent_MakeAvailable(googletest)
+# GoogleTest z lokalnego folderu, nie zainstalowany globalnie
+add_subdirectory(lib/googletest)
 
 enable_testing()
 
 add_executable(tests
-        main.cpp
-        tests.cpp
+    main.cpp
+    tests.cpp
+    types.cpp
+    storage_types.cpp
+    package.cpp
+
 )
 
+
 target_link_libraries(tests
-        gtest
-        gtest_main
+    gtest
+    gtest_main
 )
+
+add_test(NAME NetSimTests COMMAND tests)
