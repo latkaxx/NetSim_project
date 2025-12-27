@@ -12,7 +12,7 @@ Celem projektu jest implementacja symulatora przepływu półproduktów w sieci 
 
 
 
-\## Wymagania
+\#### Wymagania
 
 
 
@@ -32,11 +32,11 @@ Celem projektu jest implementacja symulatora przepływu półproduktów w sieci 
 
 
 
-\## Instalacja i uruchomienie
+\#### Instalacja i uruchomienie
 
 
 
-\### 1. Pobranie GoogleTest
+\#### 1. Pobranie GoogleTest
 
 
 
@@ -52,7 +52,7 @@ Jak się tego nie zrobi to w trakcie budowania program powinien automatycznie to
 
 
 
-\### 2. Konfiguracja projektu (CMake)
+\#### 2. Konfiguracja projektu (CMake)
 
 W katalogu projektu należy otworzyć terminal oraz zbudować projekt
 
@@ -64,15 +64,13 @@ cmake --build build
 
 ```
 
-\###Testy
+\####Testy
 
 Po poprawnym zbudowaniu projektu można uruchomić testy:
 
-```bash
-
 .\\build\\tests.exe
 
-```
+
 
 
 
