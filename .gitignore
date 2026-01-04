@@ -40,6 +40,8 @@
 # debug information files
 *.dwo
 
+# IDE files
+.vscode/
 .idea/
 
 # foldery generowane przez CMake
@@ -56,5 +58,4 @@ Makefile
 cmake_install.cmake
 
 #pliki googletest
-
 lib/

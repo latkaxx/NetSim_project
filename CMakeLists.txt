@@ -14,11 +14,16 @@ add_subdirectory(lib/googletest)
 enable_testing()
 
 add_executable(tests
-    main.cpp
-    tests.cpp
-    types.cpp
-    storage_types.cpp
-    package.cpp
+    tests/tests.cpp
+    src/main.cpp    
+    src/types.cpp
+    src/storage_types.cpp
+    src/package.cpp
+)
+
+target_include_directories(tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/lib/googletest/googletest/include
 )
 
 target_link_libraries(tests
