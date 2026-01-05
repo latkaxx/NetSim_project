@@ -19,6 +19,8 @@ add_executable(tests
     src/types.cpp
     src/storage_types.cpp
     src/package.cpp
+    src/loading_ramp.cpp
+    src/worker.cpp
 )
 
 target_include_directories(tests PRIVATE

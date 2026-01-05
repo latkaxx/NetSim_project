@@ -1,6 +1,8 @@
        
 #include "package.hxx"         
 #include "storage_types.hxx"    
+#include "worker.hxx"
+#include "loading_ramp.hxx"
 #include <gtest/gtest.h>
 
 TEST(PackageTest, IsAssignedIdLowest) {
@@ -60,4 +62,41 @@ TEST(PackageQueueTest, IsLifoCorrect) {
 
     p = q.pop();
     EXPECT_EQ(p.get_id(), 1);
+}
+
+//klasa pomocnicza do testów
+class DummyWorker : public Worker {
+public:
+    DummyWorker(ElementID id)
+        : Worker(id, PackageQueueType::FIFO, 1), received(false) {}
+    
+    void receive_package(Package&& package) override {
+        received = true;
+    }
+    
+    bool received;
+};
+
+//czy rampa dostarcza półprodukt do pracownika co turę
+TEST(LoadingRampTest, DeliversPackage) {
+    LoadingRamp ramp(1, 1); 
+    DummyWorker worker(1);
+    ramp.add_receiver(&worker);
+
+    ramp.deliver_package(1);
+    EXPECT_TRUE(worker.received);
+}
+
+//sprawdza czy pracownik pobiera ppaczkę i przetwarza przez określoną liczbe tur
+TEST(WorkerTest, PicksUpPackageAndProcesses) {
+    Worker worker(1, PackageQueueType::FIFO, 2);
+    Package p;
+    worker.receive_package(std::move(p));
+
+    EXPECT_FALSE(worker.is_busy());
+    worker.do_work(); // bierze paczkę
+    EXPECT_TRUE(worker.is_busy());
+
+    worker.do_work(); // 2 tura
+    EXPECT_FALSE(worker.is_busy()); // skończył przetwarzanie
 }
