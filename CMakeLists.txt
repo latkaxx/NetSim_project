@@ -21,6 +21,8 @@ add_executable(tests
     src/package.cpp
     src/loading_ramp.cpp
     src/worker.cpp
+    src/package_sender.cpp
+    src/receiver_preferences.cpp
 )
 
 target_include_directories(tests PRIVATE
