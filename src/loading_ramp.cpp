@@ -1,37 +1,32 @@
 #include "loading_ramp.hxx"
-#include "worker.hxx"
 
-#include <random>
+#include <stdexcept>
 
-LoadingRamp::LoadingRamp(ElementID id, std::size_t delivery_interval)
+Ramp::Ramp(ElementID id, TimeOffset delivery_interval)
     : id_(id), delivery_interval_(delivery_interval) {}
 
-ElementID LoadingRamp::get_id() const {
+ElementID Ramp::get_id() const {
     return id_;
 }
 
-//dodawanie odbiorcy
-void LoadingRamp::add_receiver(Worker* worker) {
+void Ramp::add_receiver(Worker* worker) {
     receivers_.push_back(worker);
+    receiver_preferences_.add_receiver(worker); 
 }
 
-//sprawdzanie czy w tej turze jest dostawa
-void LoadingRamp::deliver_package(std::size_t current_round) {
-    if ((current_round-1)%delivery_interval_ !=0) {
-        return;
-    }
-    if (receivers_.empty()) {
-        return;
-    }
-    Package new_package;
-    Worker* receiver = choose_receiver();
-    receiver->receive_package(std::move(new_package));
+void Ramp::deliver_goods(Time current_time) {
+    if ((current_time % delivery_interval_) != 0) return;
+    if (receivers_.empty()) return;
+
+    Package p;
+    push_package(std::move(p));  
+    send_package();             
 }
 
-//losowanie odbiorcy
-Worker* LoadingRamp::choose_receiver() {
-    static std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(0, receivers_.size() - 1);
-    return receivers_[dist(gen)];
+Worker* Ramp::choose_receiver() {
+    if (receivers_.empty()) return nullptr;
+    double r = probability_generator();
+    size_t idx = static_cast<size_t>(r * receivers_.size());
+    if (idx >= receivers_.size()) idx = receivers_.size() - 1;
+    return receivers_[idx];
 }

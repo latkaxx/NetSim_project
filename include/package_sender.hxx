@@ -2,10 +2,11 @@
 #include <optional>
 #include "receiver_preferences.hxx"
 #include "package.hxx"
+#include "helpers.hxx"
 
 class PackageSender {
 public:
-    PackageSender() = default;
+    PackageSender() : receiver_preferences_(ProbabilityGenerator()) {}
     PackageSender(PackageSender&&) = default;
 
     void send_package();

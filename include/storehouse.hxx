@@ -9,9 +9,11 @@
 
 class Storehouse : public IPackageReceiver {
 public:
-    Storehouse(ElementID id, std::unique_ptr<IPackageStockpile> stockpile);
+    //domyślnie FIFO
+    Storehouse(ElementID id, std::unique_ptr<IPackageStockpile> stockpile = 
+        std::make_unique<PackageQueue>(PackageQueueType::FIFO));
 
-    ElementID get_id() const;
+    ElementID get_id() const override;
 
     void receive_package(Package&& package) override;
 
