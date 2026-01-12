@@ -2,6 +2,7 @@
 
 #include "helpers.hxx"
 #include "ipackage_receiver.hxx"
+#include <map>
 
 
 using preferences_t = std::map<IPackageReceiver*, double>;
