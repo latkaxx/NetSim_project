@@ -3,7 +3,6 @@
 #include <random>
 #include "ipackage_receiver.hxx"
 
-using ProbabilityGenerator = std::mt19937;
 using preferences_t = std::map<IPackageReceiver*, double>;
 
 class ReceiverPreferences {
