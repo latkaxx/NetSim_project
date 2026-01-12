@@ -14,8 +14,7 @@ add_subdirectory(lib/googletest)
 enable_testing()
 
 add_executable(tests
-    tests/tests.cpp
-    src/main.cpp    
+    tests/tests.cpp  
     src/types.cpp
     src/storage_types.cpp
     src/package.cpp
@@ -24,6 +23,8 @@ add_executable(tests
     src/package_sender.cpp
     src/receiver_preferences.cpp
     src/storehouse.cpp
+    src/factory.cpp
+    src/helpers.cpp
 )
 
 target_include_directories(tests PRIVATE

@@ -5,7 +5,7 @@
 
 //Typy proste
 using ElementID = std::size_t;
-
+using Time = int;
 //Typ wyliczeniowy kolejek
 enum class PackageQueueType {
     FIFO,
