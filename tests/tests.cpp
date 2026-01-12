@@ -4,6 +4,9 @@
 #include "worker.hxx"
 #include "loading_ramp.hxx"
 #include "factory.hxx"
+#include "report_notifier.hxx"
+#include "storehouse.hxx"
+#include "simulation.hxx"
 #include "factory_io.hxx"
 #include <gtest/gtest.h>
 
@@ -192,4 +195,62 @@ TEST(WorkerTest, HasBuffer) {
     ASSERT_TRUE(buffer.has_value());
     EXPECT_EQ(buffer.value().get_id(), 1);
 }
+
+//testy symulacji
+
+//SpecificTurnsReportNotifier
+TEST(ReportNotifierTest, SpecificTurns) {
+    std::set<Time> turns{1, 3, 5};
+    SpecificTurnsReportNotifier notifier(turns);
+
+    EXPECT_TRUE(notifier.should_generate_report(1));
+    EXPECT_FALSE(notifier.should_generate_report(2));
+    EXPECT_TRUE(notifier.should_generate_report(3));
+    EXPECT_FALSE(notifier.should_generate_report(4));
+    EXPECT_TRUE(notifier.should_generate_report(5));
+}
+
+//IntervalReportNotifier
+TEST(ReportNotifierTest, IntervalTurns) {
+    IntervalReportNotifier notifier(2);
+
+    EXPECT_TRUE(notifier.should_generate_report(1));
+    EXPECT_FALSE(notifier.should_generate_report(2));
+    EXPECT_TRUE(notifier.should_generate_report(3));
+    EXPECT_FALSE(notifier.should_generate_report(4));
+    EXPECT_TRUE(notifier.should_generate_report(5));
+}
+
+//jedna runda symulacji
+TEST(SimulationTest, SingleRound) {
+    Factory factory;
+
+    factory.add_ramp(Ramp(1, 1));
+    factory.add_worker(
+        Worker(1, 1, std::make_unique<PackageQueue>(PackageQueueType::FIFO))
+    );
+    factory.add_storehouse(
+        Storehouse(1, std::make_unique<PackageQueue>(PackageQueueType::FIFO))
+    );
+
+    Ramp& r = *factory.find_ramp_by_id(1);
+    Worker& w = *factory.find_worker_by_id(1);
+    Storehouse& s = *factory.find_storehouse_by_id(1);
+
+    r.receiver_preferences().add_receiver(&w);
+    w.receiver_preferences().add_receiver(&s);
+
+    ASSERT_TRUE(factory.is_consistent());
+
+    std::vector<Time> reported_times;
+    auto report_stub = [&reported_times](Factory&, Time t) {
+        reported_times.push_back(t);
+    };
+
+    simulate(factory, 1, report_stub);
+
+    EXPECT_EQ(reported_times.size(), 1);
+    EXPECT_EQ(reported_times[0], 1);
+}
+
 
