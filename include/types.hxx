@@ -3,9 +3,9 @@
 
 #include <cstddef>
 #include <functional>
+#include <optional>
 
-//Typy proste
-using ElementID = std::size_t;
+using ElementID = std::size_t;;
 using Time = std::size_t;
 using TimeOffset = std::size_t;
 
@@ -17,5 +17,6 @@ enum class PackageQueueType {
 
 //Typ generatora prawdopodobieństwa
 using ProbabilityGenerator = std::function<double()>;
+extern ProbabilityGenerator probability_generator;
 
 #endif

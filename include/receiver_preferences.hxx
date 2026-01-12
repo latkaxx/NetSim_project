@@ -2,9 +2,8 @@
 
 #include "helpers.hxx"
 #include "ipackage_receiver.hxx"
+
 #include <map>
-
-
 using preferences_t = std::map<IPackageReceiver*, double>;
 using ProbabilityGenerator = std::function<double()>;
 
@@ -18,6 +17,7 @@ public:
     IPackageReceiver* choose_receiver();
 
     preferences_t& get_preferences();
+    const preferences_t& get_preferences() const;
 
 private:
     void normalize_preferences();

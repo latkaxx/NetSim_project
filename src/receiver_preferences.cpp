@@ -42,3 +42,6 @@ IPackageReceiver* ReceiverPreferences::choose_receiver() {
 preferences_t& ReceiverPreferences::get_preferences() {
     return preferences_;
 }
+const preferences_t& ReceiverPreferences::get_preferences() const {
+    return preferences_;
+}

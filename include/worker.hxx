@@ -5,6 +5,7 @@
 #include "ipackage_receiver.hxx"
 #include "storage_types.hxx"
 #include "package.hxx"
+#include "receiver_preferences.hxx"
 
 #include <memory>
 #include <optional>
@@ -21,6 +22,13 @@ public:
 
     Time get_package_processing_start_time() const;
     TimeOffset get_processing_duration() const;
+    void remove_receiver(IPackageReceiver* r) {
+        receiver_preferences_.remove_receiver(r);
+    }
+    
+    const ReceiverPreferences& get_receiver_preferences() const {
+        return receiver_preferences_;
+    }
 
 private:
     ElementID id_;
