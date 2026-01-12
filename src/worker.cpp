@@ -1,78 +1,45 @@
 #include "worker.hxx"
-#include "storehouse.hxx"
 
-#include <random>
-#include <stdexcept>
-
-Worker::Worker(ElementID id, PackageQueueType queue_type, std::size_t processing_time)
-    : id_(id), queue_(queue_type), processing_time_(processing_time),
-      current_package_(std::nullopt), remaining_time_(0), rng_(std::random_device{}()) {}
+Worker::Worker(ElementID id, TimeOffset pd, std::unique_ptr<IPackageQueue> queue)
+    : PackageSender()
+    , id_(id)
+    , queue_(std::move(queue))
+    , processing_duration_(pd)
+    , processing_start_time_(std::nullopt)
+    , current_package_(std::nullopt)
+{}
 
 ElementID Worker::get_id() const {
     return id_;
 }
 
-void Worker::add_worker_receiver(Worker* worker) {
-    worker_receivers_.push_back(worker);
-}
-
-void Worker::add_storehouse_receiver(Storehouse* storehouse) {
-    storehouse_receivers_.push_back(storehouse);
-}
-
 void Worker::receive_package(Package&& package) {
-    queue_.push(std::move(package));
+    queue_->push(std::move(package));
 }
 
-bool Worker::is_busy() const {
-    return current_package_.has_value();
-}
-
-void Worker::do_work() {
-    //jeśli pracownik nie pracuje i ma coś w kolejce, to bierze kolejny półprodukt
-    if (!is_busy() && !queue_.empty()) {
-        current_package_ = queue_.pop();
-        remaining_time_ = processing_time_;
+void Worker::do_work(Time t) {
+    // 1. jeśli NIC nie przetwarza i coś jest w kolejce → rozpocznij przetwarzanie
+    if (!current_package_.has_value() && !queue_->empty()) {
+        current_package_ = queue_->pop();
+        processing_start_time_ = t;
     }
 
-    //nadal pracuje, zmniejsza licznik
-    if (is_busy()) {
-        --remaining_time_;
+    // 2. jeśli przetwarza i minął czas → zakończ przetwarzanie
+    if (current_package_.has_value() && processing_start_time_.has_value()) {
+        if (t - *processing_start_time_ + 1 >= processing_duration_) {
+            // 🔥 kluczowe dla testu HasBuffer
+            push_package(std::move(*current_package_));
 
-        //skończył pracę nad półproduktem
-        if (remaining_time_ == 0) {
-            send_package();
             current_package_.reset();
+            processing_start_time_.reset();
         }
     }
 }
 
-//coś tu śmierdzi z logiką chyba, musze przekminić
-//TODO: receive_package będzie dziedziczyć po IPackageReceiver, którego jeszcze nie ma
+Time Worker::get_package_processing_start_time() const {
+    return processing_start_time_.value_or(0);
+}
 
-void Worker::send_package() {
-    if (!current_package_.has_value()) {
-        return;
-    }
-
-    std::vector<void*> all_receivers;
-    for (auto* worker : worker_receivers_) {
-        all_receivers.push_back(static_cast<void*>(worker));
-    }
-    for (auto* storehouse : storehouse_receivers_) {
-        all_receivers.push_back(static_cast<void*>(storehouse));
-    }
-
-    if (all_receivers.empty()) {
-        return;
-    }
-
-    std::uniform_int_distribution<> dist(0, all_receivers.size() - 1);
-    void* chosen = all_receivers[dist(rng_)];
-
-    if(Worker* worker = static_cast<Worker*>(chosen)) {
-        worker->receive_package(std::move(*current_package_));
-    } //else if(Storehouse* storehouse = static_cast<Storehouse*>(chosen)) {
-       // storehouse->receive_package(std::move(*current_package_));
-   // } do odkomentowania po zbudowaniu storehouse
+TimeOffset Worker::get_processing_duration() const {
+    return processing_duration_;
 }

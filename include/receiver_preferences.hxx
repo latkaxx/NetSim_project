@@ -3,8 +3,7 @@
 #include "helpers.hxx"
 #include "ipackage_receiver.hxx"
 
-#include <map>
-
+using ProbabilityGenerator = std::mt19937;
 using preferences_t = std::map<IPackageReceiver*, double>;
 using ProbabilityGenerator = std::function<double()>;
 
