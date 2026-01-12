@@ -23,6 +23,7 @@ add_executable(tests
     src/worker.cpp
     src/package_sender.cpp
     src/receiver_preferences.cpp
+    src/storehouse.cpp
 )
 
 target_include_directories(tests PRIVATE

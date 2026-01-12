@@ -3,6 +3,7 @@
 #include "types.hxx"
 #include "storage_types.hxx"
 #include "package.hxx"
+#include "ipackage_receiver.hxx"
 
 #include <optional>
 #include <vector>
@@ -10,7 +11,7 @@
 
 class Storehouse; 
 
-class Worker{
+class Worker : public IPackageReceiver {
 public:
     Worker(ElementID id, PackageQueueType queue_type, std::size_t processing_time);
     ElementID get_id() const;
@@ -19,7 +20,7 @@ public:
     void add_worker_receiver(Worker* worker);
     void add_storehouse_receiver(Storehouse* storehouse);
 
-    virtual void receive_package(Package&& package);
+    virtual void receive_package(Package&& package) override;
     void do_work();
     bool is_busy() const;
 private:
