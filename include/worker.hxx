@@ -1,39 +1,33 @@
-#pragma once //chyba lepsze niż include guards?
+#pragma once
 
 #include "types.hxx"
+#include "package_sender.hxx"
+#include "ipackage_receiver.hxx"
 #include "storage_types.hxx"
 #include "package.hxx"
-#include "ipackage_receiver.hxx"
 
+#include <memory>
 #include <optional>
-#include <vector>
-#include <random>
 
-class Storehouse; 
-
-class Worker : public IPackageReceiver {
+class Worker : public PackageSender, public IPackageReceiver {
 public:
-    Worker(ElementID id, PackageQueueType queue_type, std::size_t processing_time);
-    ElementID get_id() const;
+    Worker(ElementID id, TimeOffset pd, std::unique_ptr<IPackageQueue> queue);
 
-    //odbiorcy
-    void add_worker_receiver(Worker* worker);
-    void add_storehouse_receiver(Storehouse* storehouse);
+    ElementID get_id() const override;
 
-    virtual void receive_package(Package&& package) override;
-    void do_work();
-    bool is_busy() const;
+    void receive_package(Package&& package) override;
+
+    void do_work(Time t);
+
+    Time get_package_processing_start_time() const;
+    TimeOffset get_processing_duration() const;
+
 private:
     ElementID id_;
-    PackageQueue queue_;
-    std::size_t processing_time_;
-    std::optional<Package> current_package_;
-    std::size_t remaining_time_;
+    std::unique_ptr<IPackageQueue> queue_;
 
-    std::vector<Worker*> worker_receivers_;
-    std::vector<Storehouse*> storehouse_receivers_;
+    TimeOffset processing_duration_;
+    std::optional<Time> processing_start_time_;
 
-    std::mt19937 rng_;
-
-    void send_package();
+    std::optional<Package> current_package_; 
 };
