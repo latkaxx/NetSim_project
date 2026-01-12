@@ -16,6 +16,22 @@ ElementID Worker::get_id() const {
 void Worker::receive_package(Package&& package) {
     queue_->push(std::move(package));
 }
+ReceiverPreferences& Worker::get_receiver_preferences() {
+    return receiver_preferences_;
+}
+const ReceiverPreferences& Worker::get_receiver_preferences() const {
+    return receiver_preferences_;
+}
+
+IPackageQueue* Worker::get_queue() { 
+    return queue_.get(); 
+}
+const IPackageQueue* Worker::get_queue() const { 
+    return queue_.get(); 
+}
+void Worker::remove_receiver(IPackageReceiver* r) {
+    receiver_preferences_.remove_receiver(r);
+}
 
 void Worker::do_work(Time t) {
     // 1. jeśli NIC nie przetwarza i coś jest w kolejce → rozpocznij przetwarzanie

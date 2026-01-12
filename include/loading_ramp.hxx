@@ -15,23 +15,20 @@ public:
     Ramp(ElementID id, TimeOffset delivery_interval);
 
     ElementID get_id() const;
+    TimeOffset get_delivery_interval() const;
+    ReceiverPreferences& get_receiver_preferences();
+    const ReceiverPreferences& get_receiver_preferences() const;
 
     void add_receiver(Worker* worker);
-
+    void remove_receiver(IPackageReceiver* receiver);
     void deliver_goods(Time current_time);
-    
-    void remove_receiver(IPackageReceiver* r) {
-        receiver_preferences_.remove_receiver(r);
-    }
-    
-    const ReceiverPreferences& get_receiver_preferences() const {
-        return receiver_preferences_;
-    }
+
+
+
 
 private:
     ElementID id_;
     TimeOffset delivery_interval_;
     std::vector<Worker*> receivers_;
-
     Worker* choose_receiver();
 };

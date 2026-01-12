@@ -25,6 +25,7 @@ add_executable(tests
     src/storehouse.cpp
     src/factory.cpp
     src/helpers.cpp
+    src/factory_io.cpp
 )
 
 target_include_directories(tests PRIVATE

@@ -4,6 +4,7 @@
 #include "worker.hxx"
 #include "loading_ramp.hxx"
 #include "factory.hxx"
+#include "factory_io.hxx"
 #include <gtest/gtest.h>
 
 
@@ -85,7 +86,7 @@ TEST(FactoryTest, IsConsistentCorrect) {
 
     EXPECT_TRUE(factory.is_consistent());
 }
-/*
+
 TEST(FactoryIOTest, ParseRamp) {
     std::istringstream iss("LOADING_RAMP id=1 delivery-interval=3");
     auto factory = load_factory_structure(iss);
@@ -95,7 +96,85 @@ TEST(FactoryIOTest, ParseRamp) {
     EXPECT_EQ(1, r.get_id());
     EXPECT_EQ(3, r.get_delivery_interval());
 }
-*/
+
+//dodane testy przez norberta
+TEST(FactoryIOTest, ParseWorker) {
+    std::istringstream iss(
+        "WORKER id=2 processing-time=5 queue-type=FIFO"
+    );
+
+    auto factory = load_factory_structure(iss);
+
+    ASSERT_EQ(std::next(factory.worker_cbegin(), 1), factory.worker_cend());
+
+    const auto& w = *(factory.worker_cbegin());
+    EXPECT_EQ(2, w.get_id());
+    EXPECT_EQ(5, w.get_processing_duration());
+}
+TEST(FactoryIOTest, ParseStorehouse) {
+    std::istringstream iss(
+        "STOREHOUSE id=7"
+    );
+
+    auto factory = load_factory_structure(iss);
+
+    ASSERT_EQ(std::next(factory.storehouse_cbegin(), 1), factory.storehouse_cend());
+
+    const auto& s = *(factory.storehouse_cbegin());
+    EXPECT_EQ(7, s.get_id());
+}
+TEST(FactoryIOTest, ParseRampToWorkerLink) {
+    std::istringstream iss(
+        "LOADING_RAMP id=1 delivery-interval=2\n"
+        "WORKER id=2 processing-time=3 queue-type=FIFO\n"
+        "LINK src=ramp-1 dest=worker-2\n"
+    );
+
+    auto factory = load_factory_structure(iss);
+
+    const auto& r = *(factory.ramp_cbegin());
+    EXPECT_FALSE(r.get_receiver_preferences().get_preferences().empty());
+}
+TEST(FactoryIOTest, ParseFullFactory) {
+    std::istringstream iss(
+        "LOADING_RAMP id=1 delivery-interval=1\n"
+        "WORKER id=2 processing-time=2 queue-type=FIFO\n"
+        "STOREHOUSE id=3\n"
+        "LINK src=ramp-1 dest=worker-2\n"
+        "LINK src=worker-2 dest=store-3\n"
+    );
+
+    auto factory = load_factory_structure(iss);
+
+    EXPECT_EQ(std::distance(factory.ramp_cbegin(), factory.ramp_cend()), 1);
+    EXPECT_EQ(std::distance(factory.worker_cbegin(), factory.worker_cend()), 1);
+    EXPECT_EQ(std::distance(factory.storehouse_cbegin(), factory.storehouse_cend()), 1);
+
+    const auto& r = *(factory.ramp_cbegin());
+    const auto& w = *(factory.worker_cbegin());
+
+    EXPECT_FALSE(r.get_receiver_preferences().get_preferences().empty());
+    EXPECT_FALSE(w.get_receiver_preferences().get_preferences().empty());
+}
+TEST(FactoryIOTest, SaveFactoryStructure) {
+    Factory factory;
+    factory.add_ramp(Ramp(1, 3));
+    
+    auto queue = std::make_unique<PackageQueue>(PackageQueueType::FIFO);
+    factory.add_worker(Worker(2, 4, std::move(queue)));
+    
+    factory.add_storehouse(Storehouse(5));
+
+    std::ostringstream oss;
+    save_factory_structure(factory, oss);
+
+    const std::string output = oss.str();
+
+    EXPECT_NE(output.find("LOADING_RAMP"), std::string::npos);
+    EXPECT_NE(output.find("WORKER"), std::string::npos);
+    EXPECT_NE(output.find("STOREHOUSE"), std::string::npos);
+}
+
 TEST(WorkerTest, HasBuffer) {
     // Test scenariusza opisanego na stronie:
     // http://home.agh.edu.pl/~mdig/dokuwiki/doku.php?id=teaching:programming:soft-dev:topics:net-simulation:part_nodes#bufor_aktualnie_przetwarzanego_polproduktu
