@@ -14,14 +14,6 @@ public:
     std::optional<Package>& get_sending_buffer();
     ReceiverPreferences& receiver_preferences() { return receiver_preferences_; }
     const ReceiverPreferences& receiver_preferences() const { return receiver_preferences_; }
-    const ReceiverPreferences& get_receiver_preferences() const {
-        return receiver_preferences_;
-    }
-    
-    ReceiverPreferences& get_receiver_preferences() {
-        return receiver_preferences_;
-    }
-
 
 protected:
     ReceiverPreferences receiver_preferences_;

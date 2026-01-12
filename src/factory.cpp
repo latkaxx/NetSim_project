@@ -77,29 +77,36 @@ NodeCollection<Storehouse>::const_iterator Factory::storehouse_cend() const {
 
 
 template <typename Node>
+
 void Factory::remove_receiver(NodeCollection<Node>& collection, ElementID id) {
-    collection.remove_by_id(id);
+    auto it = collection.find_by_id(id);
+    if (it == collection.end()) return;
+
+    IPackageReceiver* receiver = &(*it);
+
+    for (auto& r : ramps_) {
+        r.remove_receiver(receiver);
+    }
 
     for (auto& w : workers_) {
-        w.remove_receiver(id);
+        w.remove_receiver(receiver);
     }
-    for (auto& r : ramps_) {
-        r.remove_receiver(id);
-    }
+
+    collection.remove_by_id(id);
 }
 
 
 bool Factory::is_consistent() const {
     for (const auto& r : ramps_) {
-        if (r.receiver_preferences_.get_preferences().empty()) {
+        if (r.receiver_preferences().get_preferences().empty())
             return false;
-        }
     }
+
     for (const auto& w : workers_) {
-        if (w.receiver_preferences_.get_preferences().empty()) {
+        if (w.receiver_preferences().get_preferences().empty())
             return false;
-        }
     }
+
     return true;
 }
 

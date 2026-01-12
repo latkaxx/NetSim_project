@@ -17,6 +17,7 @@ public:
     IPackageReceiver* choose_receiver();
 
     preferences_t& get_preferences();
+    const preferences_t& get_preferences() const;
 
 private:
     void normalize_preferences();

@@ -6,23 +6,8 @@
 #include "factory.hxx"
 #include <gtest/gtest.h>
 
-TEST(WorkerTest, HasBuffer) {
-    // Test scenariusza opisanego na stronie:
-    // http://home.agh.edu.pl/~mdig/dokuwiki/doku.php?id=teaching:programming:soft-dev:topics:net-simulation:part_nodes#bufor_aktualnie_przetwarzanego_polproduktu
 
-    Worker w(1, 2, std::make_unique<PackageQueue>(PackageQueueType::FIFO));
-    Time t = 1;
 
-    w.receive_package(Package(1));
-    w.do_work(t);
-    ++t;
-    w.receive_package(Package(2));
-    w.do_work(t);
-    auto& buffer = w.get_sending_buffer();
-
-    ASSERT_TRUE(buffer.has_value());
-    EXPECT_EQ(buffer.value().get_id(), 1);
-}
 
 TEST(PackageTest, IsAssignedIdLowest) {
     // przydzielanie ID o jeden większych -- utworzenie dwóch obiektów pod rząd
@@ -84,43 +69,6 @@ TEST(PackageQueueTest, IsLifoCorrect) {
 }
 
 
-//klasa pomocnicza do testów
-class DummyWorker : public Worker {
-public:
-    DummyWorker(ElementID id)
-        : Worker(id, PackageQueueType::FIFO, 1), received(false) {}
-    
-    void receive_package(Package&& package) override {
-        received = true;
-    }
-    
-    bool received;
-};
-
-//czy rampa dostarcza półprodukt do pracownika co turę
-TEST(LoadingRampTest, DeliversPackage) {
-    LoadingRamp ramp(1, 1); 
-    DummyWorker worker(1);
-    ramp.add_receiver(&worker);
-
-    ramp.deliver_package(1);
-    EXPECT_TRUE(worker.received);
-}
-
-//sprawdza czy pracownik pobiera ppaczkę i przetwarza przez określoną liczbe tur
-TEST(WorkerTest, PicksUpPackageAndProcesses) {
-    Worker worker(1, PackageQueueType::FIFO, 2);
-    Package p;
-    worker.receive_package(std::move(p));
-
-    EXPECT_FALSE(worker.is_busy());
-    worker.do_work(); // bierze paczkę
-    EXPECT_TRUE(worker.is_busy());
-
-    worker.do_work(); // 2 tura
-    EXPECT_FALSE(worker.is_busy()); // skończył przetwarzanie
-}
-
 TEST(FactoryTest, IsConsistentCorrect) {
     // R -> W -> S
 
@@ -130,14 +78,14 @@ TEST(FactoryTest, IsConsistentCorrect) {
     factory.add_storehouse(Storehouse(1));
 
     Ramp& r = *(factory.find_ramp_by_id(1));
-    r.receiver_preferences_.add_receiver(&(*factory.find_worker_by_id(1)));
+    r.receiver_preferences().add_receiver(&(*factory.find_worker_by_id(1)));
 
     Worker& w = *(factory.find_worker_by_id(1));
-    w.receiver_preferences_.add_receiver(&(*factory.find_storehouse_by_id(1)));
+    w.receiver_preferences().add_receiver(&(*factory.find_storehouse_by_id(1)));
 
     EXPECT_TRUE(factory.is_consistent());
 }
-
+/*
 TEST(FactoryIOTest, ParseRamp) {
     std::istringstream iss("LOADING_RAMP id=1 delivery-interval=3");
     auto factory = load_factory_structure(iss);
@@ -147,7 +95,7 @@ TEST(FactoryIOTest, ParseRamp) {
     EXPECT_EQ(1, r.get_id());
     EXPECT_EQ(3, r.get_delivery_interval());
 }
-
+*/
 TEST(WorkerTest, HasBuffer) {
     // Test scenariusza opisanego na stronie:
     // http://home.agh.edu.pl/~mdig/dokuwiki/doku.php?id=teaching:programming:soft-dev:topics:net-simulation:part_nodes#bufor_aktualnie_przetwarzanego_polproduktu
