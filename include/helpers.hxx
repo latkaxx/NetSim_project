@@ -1,5 +1,4 @@
-#ifndef HELPERS_HPP_
-#define HELPERS_HPP_
+#pragma once
 
 #include <functional>
 #include <random>
