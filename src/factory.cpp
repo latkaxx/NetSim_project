@@ -1,7 +1,7 @@
 #include "factory.hxx"
 
 // konstruktory/destruktory
-void Factory::add_ramp(LoadingRamp&& r) {
+void Factory::add_ramp(Ramp&& r) {
     ramps_.add(std::move(r));
 }
 
@@ -26,11 +26,11 @@ void Factory::remove_storehouse(ElementID id) {
 }
 
 // find
-NodeCollection<LoadingRamp>::iterator Factory::find_ramp_by_id(ElementID id) {
+NodeCollection<Ramp>::iterator Factory::find_ramp_by_id(ElementID id) {
     return ramps_.find_by_id(id);
 }
 
-NodeCollection<LoadingRamp>::const_iterator Factory::find_ramp_by_id(ElementID id) const {
+NodeCollection<Ramp>::const_iterator Factory::find_ramp_by_id(ElementID id) const {
     return ramps_.find_by_id(id);
 }
 
@@ -51,11 +51,11 @@ NodeCollection<Storehouse>::const_iterator Factory::find_storehouse_by_id(Elemen
 }
 
 // iteratory
-NodeCollection<LoadingRamp>::const_iterator Factory::ramp_cbegin() const {
+NodeCollection<Ramp>::const_iterator Factory::ramp_cbegin() const {
     return ramps_.cbegin();
 }
 
-NodeCollection<LoadingRamp>::const_iterator Factory::ramp_cend() const {
+NodeCollection<Ramp>::const_iterator Factory::ramp_cend() const {
     return ramps_.cend();
 }
 

@@ -53,7 +53,7 @@ private:
 class Factory {
 public:
     // dodawanie / usuwanie
-    void add_ramp(LoadingRamp&&);
+    void add_ramp(Ramp&&);
     void remove_ramp(ElementID);
 
     void add_worker(Worker&&);
@@ -63,8 +63,8 @@ public:
     void remove_storehouse(ElementID);
 
     // wyszukiwanie 
-    NodeCollection<LoadingRamp>::iterator find_ramp_by_id(ElementID);
-    NodeCollection<LoadingRamp>::const_iterator find_ramp_by_id(ElementID) const;
+    NodeCollection<Ramp>::iterator find_ramp_by_id(ElementID);
+    NodeCollection<Ramp>::const_iterator find_ramp_by_id(ElementID) const;
 
     NodeCollection<Worker>::iterator find_worker_by_id(ElementID);
     NodeCollection<Worker>::const_iterator find_worker_by_id(ElementID) const;
@@ -73,8 +73,8 @@ public:
     NodeCollection<Storehouse>::const_iterator find_storehouse_by_id(ElementID) const;
 
     // teratory
-    NodeCollection<LoadingRamp>::const_iterator ramp_cbegin() const;
-    NodeCollection<LoadingRamp>::const_iterator ramp_cend() const;
+    NodeCollection<Ramp>::const_iterator ramp_cbegin() const;
+    NodeCollection<Ramp>::const_iterator ramp_cend() const;
 
     NodeCollection<Worker>::const_iterator worker_cbegin() const;
     NodeCollection<Worker>::const_iterator worker_cend() const;
@@ -90,7 +90,7 @@ public:
     void do_package_passing();
 
 private:
-    NodeCollection<LoadingRamp> ramps_;
+    NodeCollection<Ramp> ramps_;
     NodeCollection<Worker> workers_;
     NodeCollection<Storehouse> storehouses_;
 

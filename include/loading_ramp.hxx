@@ -4,6 +4,7 @@
 #include "worker.hxx"
 #include "package_sender.hxx"
 #include "helpers.hxx"
+#include "receiver_preferences.hxx"
 
 #include <vector>
 #include <memory>
@@ -18,6 +19,14 @@ public:
     void add_receiver(Worker* worker);
 
     void deliver_goods(Time current_time);
+    
+    void remove_receiver(IPackageReceiver* r) {
+        receiver_preferences_.remove_receiver(r);
+    }
+    
+    const ReceiverPreferences& get_receiver_preferences() const {
+        return receiver_preferences_;
+    }
 
 private:
     ElementID id_;
