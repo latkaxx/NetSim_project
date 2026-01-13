@@ -253,4 +253,41 @@ TEST(SimulationTest, SingleRound) {
     EXPECT_EQ(reported_times[0], 1);
 }
 
+//inne testy własne
+
+// dodawanie i usuwanie odbiorców w ReceiverPreferences
+TEST(ReceiverPreferencesTest, AddRemoveReceiver) {
+    ReceiverPreferences prefs;
+
+    class DummyReceiver : public IPackageReceiver {
+    public:
+        DummyReceiver(ElementID id) : id_(id) {}
+        void receive_package(Package&&) override {}
+        ElementID get_id() const override { return id_; }
+    private:
+        ElementID id_;
+    };
+
+    DummyReceiver r1(1), r2(2);
+
+    prefs.add_receiver(&r1);
+    prefs.add_receiver(&r2);
+
+    EXPECT_EQ(prefs.get_preferences().size(), 2);
+
+    prefs.remove_receiver(&r1);
+    EXPECT_EQ(prefs.get_preferences().size(), 1);
+}
+
+// test odbierania paczki przez Storehouse i jej składowania
+TEST(StorehouseTest, ReceivePackageStored) {
+    auto stockpile = std::make_unique<PackageQueue>(PackageQueueType::FIFO);
+    Storehouse s(1, std::move(stockpile));
+
+    s.receive_package(Package(1));
+
+    EXPECT_FALSE(s.get_stockpile().empty());
+}
+
+
 
