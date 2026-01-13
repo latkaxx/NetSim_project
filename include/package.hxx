@@ -1,5 +1,4 @@
-#ifndef PACKAGE_HXX
-#define PACKAGE_HXX
+#pragma once
 
 #include "types.hxx"
 #include <set>
@@ -28,4 +27,3 @@ private:
     static ElementID generate_id();
 };
 
-#endif

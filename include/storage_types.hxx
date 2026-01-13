@@ -1,5 +1,4 @@
-#ifndef STORAGE_TYPES_HXX
-#define STORAGE_TYPES_HXX
+#pragma once
 
 #include "package.hxx"
 #include "types.hxx"
@@ -52,4 +51,3 @@ private:
     std::list<Package> container_;
 };
 
-#endif

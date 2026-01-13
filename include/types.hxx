@@ -1,5 +1,4 @@
-#ifndef TYPES_HXX
-#define TYPES_HXX
+#pragma once
 
 #include <cstddef>
 #include <functional>
@@ -18,5 +17,3 @@ enum class PackageQueueType {
 //Typ generatora prawdopodobieństwa
 using ProbabilityGenerator = std::function<double()>;
 extern ProbabilityGenerator probability_generator;
-
-#endif
