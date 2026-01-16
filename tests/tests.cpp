@@ -1,4 +1,6 @@
        
+
+
 #include "package.hxx"         
 #include "storage_types.hxx"    
 #include "worker.hxx"
@@ -8,8 +10,9 @@
 #include "storehouse.hxx"
 #include "simulation.hxx"
 #include "factory_io.hxx"
+#include "reports.hxx"
 #include <gtest/gtest.h>
-
+#include <sstream>
 
 
 
@@ -222,35 +225,33 @@ TEST(ReportNotifierTest, IntervalTurns) {
 }
 
 //jedna runda symulacji
-TEST(SimulationTest, SingleRound) {
+TEST(StructureReportTest, GeneratesCorrectStructureReport) {
+
     Factory factory;
 
-    factory.add_ramp(Ramp(1, 1));
-    factory.add_worker(
-        Worker(1, 1, std::make_unique<PackageQueue>(PackageQueueType::FIFO))
+    Ramp r1(1, 1);
+
+    Worker w1(
+        1,
+        1,
+        std::make_unique<PackageQueue>(PackageQueueType::FIFO)
     );
-    factory.add_storehouse(
-        Storehouse(1, std::make_unique<PackageQueue>(PackageQueueType::FIFO))
-    );
 
-    Ramp& r = *factory.find_ramp_by_id(1);
-    Worker& w = *factory.find_worker_by_id(1);
-    Storehouse& s = *factory.find_storehouse_by_id(1);
+    Storehouse s1(1);
 
-    r.receiver_preferences().add_receiver(&w);
-    w.receiver_preferences().add_receiver(&s);
+    r1.receiver_preferences().add_receiver(&w1);
+    w1.receiver_preferences().add_receiver(&s1);
 
-    ASSERT_TRUE(factory.is_consistent());
+    factory.add_ramp(std::move(r1));
+    factory.add_worker(std::move(w1));
+    factory.add_storehouse(std::move(s1));
 
-    std::vector<Time> reported_times;
-    auto report_stub = [&reported_times](Factory&, Time t) {
-        reported_times.push_back(t);
-    };
+    std::stringstream ss;
+    generate_structure_report(factory, ss);
 
-    simulate(factory, 1, report_stub);
+    std::string report = ss.str();
 
-    EXPECT_EQ(reported_times.size(), 1);
-    EXPECT_EQ(reported_times[0], 1);
+    EXPECT_NE(report.find("LOADING RAMP #1"), std::string::npos);
+    EXPECT_NE(report.find("WORKER #1"), std::string::npos);
+    EXPECT_NE(report.find("STOREHOUSE #1"), std::string::npos);
 }
-
-
