@@ -53,9 +53,6 @@ void generate_structure_report(const Factory& factory, std::ostream& os) {
 void generate_simulation_report(const Factory& factory, std::ostream& os, Time t) {
 
     os << "=== [ Turn: " << t << " ] ===\n\n";
-
-    /* ================= WORKERS ================= */
-
     os << "== WORKERS ==\n\n";
 
     std::vector<const Worker*> workers;
@@ -71,7 +68,6 @@ void generate_simulation_report(const Factory& factory, std::ostream& os, Time t
     for (const Worker* w : workers) {
         os << "WORKER #" << w->get_id() << "\n";
 
-        // PBuffer
         const auto& pbuf = w->get_processing_package();
         if (pbuf.has_value()) {
             os << "  PBuffer: #"
@@ -81,7 +77,6 @@ void generate_simulation_report(const Factory& factory, std::ostream& os, Time t
             os << "  PBuffer: (empty)\n";
         }
 
-        // Queue
         const auto* q = w->get_queue();
         if (q->empty()) {
             os << "  Queue: (empty)\n";
@@ -96,7 +91,6 @@ void generate_simulation_report(const Factory& factory, std::ostream& os, Time t
             os << "\n";
         }
 
-        // SBuffer
         const auto& sbuf = w->get_sending_buffer();
         if (sbuf.has_value()) {
             os << "  SBuffer: #"
@@ -107,8 +101,6 @@ void generate_simulation_report(const Factory& factory, std::ostream& os, Time t
 
         os << "\n";
     }
-
-    /* ================= STOREHOUSES ================= */
 
     os << "== STOREHOUSES ==\n\n";
 
