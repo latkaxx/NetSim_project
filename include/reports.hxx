@@ -6,7 +6,7 @@
 
 
 
-void generate_structure_report(Factory& factory, std::ostream& os);
+void generate_structure_report(const Factory& factory, std::ostream& os);
 
 
-//void generate_simulation_report(Factory& factory, std::ostream& os, Time t);
+void generate_simulation_report(const Factory& factory, std::ostream& os, Time t);

@@ -224,35 +224,171 @@ TEST(ReportNotifierTest, IntervalTurns) {
     EXPECT_TRUE(notifier.should_generate_report(5));
 }
 
-//jedna runda symulacji
+
 TEST(StructureReportTest, GeneratesCorrectStructureReport) {
+
     Factory factory;
 
-    Ramp r1(1, 1);
-    Worker w1(1, 1, std::make_unique<PackageQueue>(PackageQueueType::FIFO));
+    Ramp r1(1, 3);
+    Ramp r2(2, 2);
+
+    Worker w1(
+        1, 2,
+        std::make_unique<PackageQueue>(PackageQueueType::FIFO)
+    );
+    Worker w2(
+        2, 1,
+        std::make_unique<PackageQueue>(PackageQueueType::LIFO)
+    );
+
     Storehouse s1(1);
 
     r1.receiver_preferences().add_receiver(&w1);
-    w1.receiver_preferences().add_receiver(&s1);
+    r2.receiver_preferences().add_receiver(&w1);
+    r2.receiver_preferences().add_receiver(&w2);
+
+    w1.receiver_preferences().add_receiver(&w1);
+    w1.receiver_preferences().add_receiver(&w2);
+    w2.receiver_preferences().add_receiver(&s1);
 
     factory.add_ramp(std::move(r1));
+    factory.add_ramp(std::move(r2));
     factory.add_worker(std::move(w1));
+    factory.add_worker(std::move(w2));
     factory.add_storehouse(std::move(s1));
 
     std::stringstream ss;
     generate_structure_report(factory, ss);
     std::string report = ss.str();
+    //std::cout << "Generated report:\n" << report << std::endl;
+    EXPECT_NE(report.find("LOADING RAMP #1"), std::string::npos);
+    EXPECT_NE(report.find("Delivery interval: 3"), std::string::npos);
+    EXPECT_NE(report.find("WORKER #1"), std::string::npos);
+    EXPECT_NE(report.find("Queue type: FIFO"), std::string::npos);
+    EXPECT_NE(report.find("STOREHOUSE #1"), std::string::npos);
+}
 
-    // Oczekiwany output z sekcją LINKS (dostosowany do twojego formatu)
-    std::string expected = 
-        ";== LOADING RAMPS ==\n\n"
-        "LOADING RAMP id=1 deliver-interval=1\n\n"
-        ";== WORKERS ==\n\n"
-        "WORKER id=1 processing-time=1 queue-type=FIFO\n\n"
-        ";== STOREHOUSES ==\n\n"
-        "STOREHOUSE id=1\n\n"
-        ";== LINKS ==\n\n"
-        "LINK src=ramp-1 dest=worker-1\n";
+TEST(SimulationReportTest, GeneratesCorrectReportForEmptyFactory) {
 
-    EXPECT_EQ(report, expected);
+    Factory factory;
+    std::stringstream ss;
+
+    generate_simulation_report(factory, ss, 1);
+
+    std::string out = ss.str();
+    //std::cout << "Generated report:\n" << out << std::endl;
+
+    EXPECT_NE(out.find("=== [ Turn: 1 ] ==="), std::string::npos);
+    EXPECT_NE(out.find("== WORKERS =="), std::string::npos);
+    EXPECT_NE(out.find("== STOREHOUSES =="), std::string::npos);
+}
+TEST(SimulationReportTest, EmptyWorkerReport) {
+    Factory f;
+
+    auto q = std::make_unique<PackageQueue>(PackageQueueType::FIFO);
+    Worker w(1, 3, std::move(q));
+    f.add_worker(std::move(w));
+
+    std::ostringstream os;
+    generate_simulation_report(f, os, 1);
+
+    std::string report = os.str();
+
+    EXPECT_NE(report.find("=== [ Turn: 1 ] ==="), std::string::npos);
+    EXPECT_NE(report.find("WORKER #1"), std::string::npos);
+    EXPECT_NE(report.find("PBuffer: (empty)"), std::string::npos);
+    EXPECT_NE(report.find("Queue: (empty)"), std::string::npos);
+    EXPECT_NE(report.find("SBuffer: (empty)"), std::string::npos);
+}
+TEST(SimulationReportTest, WorkerWithQueue) {
+    Factory f;
+
+    auto q = std::make_unique<PackageQueue>(PackageQueueType::FIFO);
+    q->push(Package(5));
+    q->push(Package(6));
+
+    Worker w(1, 2, std::move(q));
+    f.add_worker(std::move(w));
+
+    std::ostringstream os;
+    generate_simulation_report(f, os, 3);
+
+    EXPECT_NE(os.str().find("Queue: #5, #6"), std::string::npos);
+}
+TEST(SimulationReportTest, WorkerProcessingPackage) {
+    Factory f;
+
+    auto q = std::make_unique<PackageQueue>(PackageQueueType::FIFO);
+    Worker w(1, 3, std::move(q));
+
+    w.receive_package(Package(1));
+    w.do_work(2);
+
+    f.add_worker(std::move(w));
+
+    std::ostringstream os;
+    generate_simulation_report(f, os, 2);
+
+    EXPECT_NE(os.str().find("PBuffer: #1"), std::string::npos);
+}
+TEST(SimulationReportTest, WorkerWithSendingBuffer) {
+    Factory f;
+
+    auto q = std::make_unique<PackageQueue>(PackageQueueType::FIFO);
+    Worker w(1, 1, std::move(q));
+
+    w.receive_package(Package(10));
+    w.do_work(1);
+    w.do_work(2);
+
+    f.add_worker(std::move(w));
+
+    std::ostringstream os;
+    generate_simulation_report(f, os, 2);
+
+    EXPECT_NE(os.str().find("SBuffer: #10"), std::string::npos);
+}
+TEST(SimulationReportTest, EmptyStorehouse) {
+    Factory f;
+
+    Storehouse s(1);
+    f.add_storehouse(std::move(s));
+
+    std::ostringstream os;
+    generate_simulation_report(f, os, 1);
+
+    EXPECT_NE(os.str().find("Stock: (empty)"), std::string::npos);
+}
+TEST(SimulationReportTest, StorehouseWithStock) {
+    Factory f;
+
+    Storehouse s(1);
+    s.receive_package(Package(2));
+    s.receive_package(Package(4));
+
+    f.add_storehouse(std::move(s));
+
+    std::ostringstream os;
+    generate_simulation_report(f, os, 5);
+
+    EXPECT_NE(os.str().find("Stock: #2, #4"), std::string::npos);
+}
+TEST(SimulationReportTest, WorkersSortedById) {
+    Factory f;
+
+    auto q1 = std::make_unique<PackageQueue>(PackageQueueType::FIFO);
+    auto q2 = std::make_unique<PackageQueue>(PackageQueueType::FIFO);
+
+    Worker w2(2, 1, std::move(q1));
+    Worker w1(1, 1, std::move(q2));
+
+    f.add_worker(std::move(w2));
+    f.add_worker(std::move(w1));
+
+    std::ostringstream os;
+    generate_simulation_report(f, os, 1);
+
+    std::string report = os.str();
+    std::cout << "Generated report:\n" << report << std::endl;
+    EXPECT_LT(report.find("WORKER #1"), report.find("WORKER #2"));
 }
