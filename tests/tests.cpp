@@ -226,17 +226,10 @@ TEST(ReportNotifierTest, IntervalTurns) {
 
 //jedna runda symulacji
 TEST(StructureReportTest, GeneratesCorrectStructureReport) {
-
     Factory factory;
 
     Ramp r1(1, 1);
-
-    Worker w1(
-        1,
-        1,
-        std::make_unique<PackageQueue>(PackageQueueType::FIFO)
-    );
-
+    Worker w1(1, 1, std::make_unique<PackageQueue>(PackageQueueType::FIFO));
     Storehouse s1(1);
 
     r1.receiver_preferences().add_receiver(&w1);
@@ -248,10 +241,18 @@ TEST(StructureReportTest, GeneratesCorrectStructureReport) {
 
     std::stringstream ss;
     generate_structure_report(factory, ss);
-
     std::string report = ss.str();
 
-    EXPECT_NE(report.find("LOADING RAMP #1"), std::string::npos);
-    EXPECT_NE(report.find("WORKER #1"), std::string::npos);
-    EXPECT_NE(report.find("STOREHOUSE #1"), std::string::npos);
+    // Oczekiwany output z sekcją LINKS (dostosowany do twojego formatu)
+    std::string expected = 
+        ";== LOADING RAMPS ==\n\n"
+        "LOADING RAMP id=1 deliver-interval=1\n\n"
+        ";== WORKERS ==\n\n"
+        "WORKER id=1 processing-time=1 queue-type=FIFO\n\n"
+        ";== STOREHOUSES ==\n\n"
+        "STOREHOUSE id=1\n\n"
+        ";== LINKS ==\n\n"
+        "LINK src=ramp-1 dest=worker-1\n";
+
+    EXPECT_EQ(report, expected);
 }
