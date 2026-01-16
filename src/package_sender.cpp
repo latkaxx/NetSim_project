@@ -17,3 +17,6 @@ void PackageSender::send_package() {
 std::optional<Package>& PackageSender::get_sending_buffer() {
     return sending_buffer_;
 }
+const std::optional<Package>& PackageSender::get_sending_buffer() const {
+    return sending_buffer_;
+}

@@ -30,6 +30,7 @@ public:
 
     void remove_receiver(IPackageReceiver* r);
 
+    const std::optional<Package>& get_processing_package() const;
     
 
 private:

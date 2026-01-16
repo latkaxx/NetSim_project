@@ -32,6 +32,10 @@ const IPackageQueue* Worker::get_queue() const {
 void Worker::remove_receiver(IPackageReceiver* r) {
     receiver_preferences_.remove_receiver(r);
 }
+const std::optional<Package>& Worker::get_processing_package() const {
+    return current_package_;
+}
+
 
 void Worker::do_work(Time t) {
     // 1. jeśli NIC nie przetwarza i coś jest w kolejce → rozpocznij przetwarzanie

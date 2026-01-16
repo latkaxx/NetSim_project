@@ -12,6 +12,7 @@ public:
     void send_package();
     void push_package(Package&& p);
     std::optional<Package>& get_sending_buffer();
+    const std::optional<Package>& get_sending_buffer() const;
     ReceiverPreferences& receiver_preferences() { return receiver_preferences_; }
     const ReceiverPreferences& receiver_preferences() const { return receiver_preferences_; }
 
