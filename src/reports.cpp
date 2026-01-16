@@ -53,23 +53,36 @@ void generate_structure_report(const Factory& factory, std::ostream& os) {
 void generate_simulation_report(const Factory& factory, std::ostream& os, Time t) {
 
     os << "=== [ Turn: " << t << " ] ===\n\n";
+
+    /* ================= WORKERS ================= */
+
     os << "== WORKERS ==\n\n";
 
+    std::vector<const Worker*> workers;
     for (auto it = factory.worker_cbegin(); it != factory.worker_cend(); ++it) {
-        const Worker& w = *it;
+        workers.push_back(&(*it));
+    }
 
-        os << "WORKER #" << w.get_id() << "\n";
+    std::sort(workers.begin(), workers.end(),
+              [](const Worker* a, const Worker* b) {
+                  return a->get_id() < b->get_id();
+              });
 
-        const auto& pbuf = w.get_processing_package();
+    for (const Worker* w : workers) {
+        os << "WORKER #" << w->get_id() << "\n";
+
+        // PBuffer
+        const auto& pbuf = w->get_processing_package();
         if (pbuf.has_value()) {
             os << "  PBuffer: #"
-            << pbuf->get_id()
-            << " (pt = " << w.get_processing_duration() << ")\n";
+               << pbuf->get_id()
+               << " (pt = " << w->get_processing_duration() << ")\n";
         } else {
             os << "  PBuffer: (empty)\n";
-}
+        }
 
-        const auto* q = w.get_queue();
+        // Queue
+        const auto* q = w->get_queue();
         if (q->empty()) {
             os << "  Queue: (empty)\n";
         } else {
@@ -83,8 +96,8 @@ void generate_simulation_report(const Factory& factory, std::ostream& os, Time t
             os << "\n";
         }
 
-        auto& sbuf = const_cast<Worker&>(w).get_sending_buffer();
-
+        // SBuffer
+        const auto& sbuf = w->get_sending_buffer();
         if (sbuf.has_value()) {
             os << "  SBuffer: #"
                << sbuf->get_id() << "\n";
@@ -95,16 +108,24 @@ void generate_simulation_report(const Factory& factory, std::ostream& os, Time t
         os << "\n";
     }
 
+    /* ================= STOREHOUSES ================= */
 
-    os << "\n== STOREHOUSES ==\n\n";
+    os << "== STOREHOUSES ==\n\n";
 
+    std::vector<const Storehouse*> stores;
     for (auto it = factory.storehouse_cbegin(); it != factory.storehouse_cend(); ++it) {
-        const Storehouse& s = *it;
+        stores.push_back(&(*it));
+    }
 
-        os << "STOREHOUSE #" << s.get_id() << "\n";
+    std::sort(stores.begin(), stores.end(),
+              [](const Storehouse* a, const Storehouse* b) {
+                  return a->get_id() < b->get_id();
+              });
 
-        const auto& stock = s.get_stockpile();
+    for (const Storehouse* s : stores) {
+        os << "STOREHOUSE #" << s->get_id() << "\n";
 
+        const auto& stock = s->get_stockpile();
         if (stock.empty()) {
             os << "  Stock: (empty)\n";
         } else {

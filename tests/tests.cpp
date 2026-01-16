@@ -389,6 +389,6 @@ TEST(SimulationReportTest, WorkersSortedById) {
     generate_simulation_report(f, os, 1);
 
     std::string report = os.str();
-    std::cout << "Generated report:\n" << report << std::endl;
+    //std::cout << "Generated report:\n" << report << std::endl;
     EXPECT_LT(report.find("WORKER #1"), report.find("WORKER #2"));
 }
