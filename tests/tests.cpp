@@ -392,3 +392,31 @@ TEST(SimulationReportTest, WorkersSortedById) {
     //std::cout << "Generated report:\n" << report << std::endl;
     EXPECT_LT(report.find("WORKER #1"), report.find("WORKER #2"));
 }
+TEST(SimulationReportTest, DifferentTurnsProduceDifferentReports) {
+    Factory f;
+
+    auto q = std::make_unique<PackageQueue>(PackageQueueType::FIFO);
+    Worker w(1, 2, std::move(q));
+    Storehouse s(1);
+
+    w.receiver_preferences().add_receiver(&s);
+
+    f.add_worker(std::move(w));
+    f.add_storehouse(std::move(s));
+
+    // tura 1
+    f.do_work(1);
+    f.do_package_passing();
+
+    std::ostringstream os1;
+    generate_simulation_report(f, os1, 1);
+
+    // tura 2
+    f.do_work(2);
+    f.do_package_passing();
+
+    std::ostringstream os2;
+    generate_simulation_report(f, os2, 2);
+
+    EXPECT_NE(os1.str(), os2.str());
+}
