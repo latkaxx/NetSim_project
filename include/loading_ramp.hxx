@@ -23,9 +23,6 @@ public:
     void remove_receiver(IPackageReceiver* receiver);
     void deliver_goods(Time current_time);
 
-
-
-
 private:
     ElementID id_;
     TimeOffset delivery_interval_;

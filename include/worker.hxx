@@ -32,7 +32,6 @@ public:
 
     const std::optional<Package>& get_processing_package() const;
     
-
 private:
     ElementID id_;
     std::unique_ptr<IPackageQueue> queue_;

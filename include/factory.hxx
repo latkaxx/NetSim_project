@@ -8,7 +8,6 @@
 #include <list>
 #include <algorithm>
 
-
 template <typename Node>
 class NodeCollection {
 public:
@@ -24,7 +23,6 @@ public:
 
     const_iterator cbegin() const { return container_.cbegin(); }
     const_iterator cend() const { return container_.cend(); }
-
 
     void add(Node&& node) {
         container_.push_back(std::move(node));
@@ -49,7 +47,6 @@ public:
 private:
     container_t container_;
 };
-
 
 class Factory {
 public:
