@@ -25,8 +25,6 @@ void Ramp::remove_receiver(IPackageReceiver* receiver) {
     receiver_preferences_.remove_receiver(receiver);
 }
 
-
-
 void Ramp::deliver_goods(Time current_time) {
     if ((current_time % delivery_interval_) != 0) return;
     if (receivers_.empty()) return;

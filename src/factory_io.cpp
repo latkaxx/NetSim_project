@@ -84,7 +84,6 @@ Factory load_factory_structure(std::istream& is) {
     return factory;
 }
 
-
 void save_factory_structure(const Factory& factory, std::ostream& os) {
 
     for (auto it = factory.ramp_cbegin(); it != factory.ramp_cend(); ++it) {

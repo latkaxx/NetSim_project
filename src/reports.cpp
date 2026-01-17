@@ -4,7 +4,7 @@
 #include "factory.hxx"
 #include "package.hxx"
 
-    #include <sstream>
+#include <sstream>
 
 void generate_structure_report(const Factory& factory, std::ostream& os) {
 
@@ -130,7 +130,6 @@ void generate_simulation_report(const Factory& factory, std::ostream& os, Time t
             }
             os << "\n";
         }
-
         os << "\n";
     }
 }
