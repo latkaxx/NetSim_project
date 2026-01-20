@@ -328,6 +328,8 @@ TEST(SimulationReportTest, WorkerProcessingPackage) {
 
     std::ostringstream os;
     generate_simulation_report(f, os, 2);
+    std::string report = os.str();
+    std::cout << "Generated report:\n" << report << std::endl;
 
     EXPECT_NE(os.str().find("PBuffer: #1"), std::string::npos);
 }
@@ -345,7 +347,8 @@ TEST(SimulationReportTest, WorkerWithSendingBuffer) {
 
     std::ostringstream os;
     generate_simulation_report(f, os, 2);
-
+    std::string report = os.str();
+    std::cout << "Generated report:\n" << report << std::endl;
     EXPECT_NE(os.str().find("SBuffer: #10"), std::string::npos);
 }
 TEST(SimulationReportTest, EmptyStorehouse) {
@@ -356,7 +359,7 @@ TEST(SimulationReportTest, EmptyStorehouse) {
 
     std::ostringstream os;
     generate_simulation_report(f, os, 1);
-
+    std::cout << "Generated report:\n" << os.str() << std::endl;
     EXPECT_NE(os.str().find("Stock: (empty)"), std::string::npos);
 }
 TEST(SimulationReportTest, StorehouseWithStock) {
@@ -370,7 +373,8 @@ TEST(SimulationReportTest, StorehouseWithStock) {
 
     std::ostringstream os;
     generate_simulation_report(f, os, 5);
-
+    std::string report = os.str();
+    std::cout << "Generated report:\n" << report << std::endl;    
     EXPECT_NE(os.str().find("Stock: #2, #4"), std::string::npos);
 }
 TEST(SimulationReportTest, WorkersSortedById) {
@@ -387,9 +391,7 @@ TEST(SimulationReportTest, WorkersSortedById) {
 
     std::ostringstream os;
     generate_simulation_report(f, os, 1);
-
     std::string report = os.str();
-    //std::cout << "Generated report:\n" << report << std::endl;
     EXPECT_LT(report.find("WORKER #1"), report.find("WORKER #2"));
 }
 TEST(SimulationReportTest, DifferentTurnsProduceDifferentReports) {
@@ -419,4 +421,5 @@ TEST(SimulationReportTest, DifferentTurnsProduceDifferentReports) {
     generate_simulation_report(f, os2, 2);
 
     EXPECT_NE(os1.str(), os2.str());
+    
 }
