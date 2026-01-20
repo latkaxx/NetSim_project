@@ -20,3 +20,10 @@ std::optional<Package>& PackageSender::get_sending_buffer() {
 const std::optional<Package>& PackageSender::get_sending_buffer() const {
     return sending_buffer_;
 }
+
+ReceiverPreferences& PackageSender::receiver_preferences() { 
+    return receiver_preferences_; 
+}
+const ReceiverPreferences& PackageSender::receiver_preferences() const { 
+    return receiver_preferences_; 
+}
